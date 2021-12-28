@@ -1,0 +1,18 @@
+version: '3.4'
+volumes:
+  db:
+    # external: true
+
+services:
+  animechallenge:
+    image: AnimeChallenge
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 5050:5050
+      - 5678:5678
+    volumes:
+      - db:/app/database
+      - G:\\My Drive\\ANIME_CHALLENGE:/app/G_DRIVE
+

@@ -1,0 +1,53 @@
+{% extends 'base.jinja2' %}
+{%block title%} Lists  {%endblock%}
+{% block styles %} 
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #c5bebe;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dbdbdb;
+}
+{%endblock%}
+{%block content%} 
+<br>
+{% for i in members %}
+    <br>
+    <div class="container">
+        <h2> List from {{i}}:</h2>
+    </div>
+
+    <div class="container" id="containers">
+    <table>
+        <tr>
+            {% for col in column_names %}
+            <th>{{col|capitalize}}</th>
+            {% endfor %}
+        </tr>
+        {% for row in row_data[i] %}
+        <tr>
+            {% for col, row_ in zip(column_names, row) %}
+            {% if col == link_column %}
+            <td>
+                <a href="https://shikimori.one/animes/{{row_}}">{{ row_ }}</a>
+            </td>
+            {% else %}
+            <td>{{row_}}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+
+    </table>
+    </div>
+    <br>
+{% endfor %}
+{%endblock%}

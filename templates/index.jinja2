@@ -1,0 +1,17 @@
+{% extends 'base.jinja2' %}
+{%block title%} Home  {%endblock%}
+{%block content%} 
+<div class="container"><br>
+<h3>Members:</h3><br>
+</div>
+<div class="container" id="containers">
+    <ul>
+        {%for container in content%}
+        <li>
+            <p><a href="https://shikimori.one/{{ container }}">{{ container }}</a></p>
+        </li>
+        {%endfor%}
+    </ul>
+</div>
+
+{%endblock%}

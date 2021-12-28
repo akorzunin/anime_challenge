@@ -1,0 +1,12 @@
+{% extends 'base.jinja2' %}
+{%block title%} Stats {%endblock%}
+{%block content%} 
+<div class="container">
+    {{ "{%app_entry%}" }}
+    <footer>
+        {{ "{%config%}" }}
+        {{ "{%scripts%}" }}
+        {{ "{%renderer%}" }}
+    </footer>
+</div>
+{%endblock%}

@@ -1,0 +1,10 @@
+{% extends 'base.jinja2' %}
+{%block title%} Ebalo  {%endblock%}
+{% block styles %} 
+{{styles_txt}}
+{%endblock%}
+{%block content%} 
+<div class="container">
+    {{ content|safe }}
+</div>
+{%endblock%}
