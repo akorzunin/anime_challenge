@@ -1,1 +1,1 @@
-killall python flask_main.py
+pkill -f flask_main.py
