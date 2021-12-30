@@ -3,6 +3,7 @@ from flask import Flask, app, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 import pandas as pd
+from pandas.core.frame import DataFrame
 from SHIKI_API import ShiNoAuth, ShiAuth
 from member_list import members
 import yaml
@@ -44,17 +45,6 @@ defaults = {
     'folder_content_html': folder_content_html,
     # 'url_for': url_for,
 }
-# rename columns in df
-# Use Unicode Character “⠀” (U+2800) to prevent line breaks
-rename_dict = {
-    'id': '№',
-    'to_usr': 'to⠀user⠀⠀⠀⠀⠀',
-    'from_usr': 'from user',
-    'max_ep': 'ep',
-    'name_en':'title name [en]',
-    'name_ru':'title name [ru]',
-    'title_id': 'title⠀id',
-    }
 # attach dashboard to flask
 app = init_dashboard(
     app,
@@ -91,6 +81,27 @@ class Member(db.Model):
         self.from_usr = from_usr
         self.to_usr = to_usr
 
+# rename columns in df
+# Use Unicode Character “⠀” (U+2800) to prevent line breaks
+rename_dict = {
+    'id': '№',
+    'to_usr': 'to⠀user',
+    'from_usr': 'from⠀user',
+    'max_ep': 'ep',
+    'name_en':'title name [en]',
+    'name_ru':'title name [ru]',
+    'title_id': 'title⠀id',
+    }
+
+def format_df(df: DataFrame) -> DataFrame:
+    '''format DataFrame to render in jinja2'''
+    # change db index to number of row
+    df['id'] = df.index
+    df['to_usr'] = df['to_usr'].apply(lambda x: x[:-2])
+    # Use Unicode Character “⠀” (U+2800) to prevent line breaks
+    df = df.rename(columns=rename_dict)
+    return df
+
 @app.route('/')
 def home():
     return render_template('index.jinja2', 
@@ -114,11 +125,7 @@ def lists_to_others():
             'sqlite:///' + db_name, 
             # index_col='id',
             )
-        # change db index to number of row
-        df['id'] = df.index
-        # Use Unicode Character “⠀” (U+2800) to prevent line breaks
-        df = df.rename(columns=rename_dict)
-        df_dict[username] = df
+        df_dict[username] = format_df(df)
 
 
     return render_template(
@@ -140,11 +147,7 @@ def lists_from_others():
             'sqlite:///' + db_name, 
             # index_col='id',
             )
-        # change db index to number of row
-        df['id'] = df.index
-        # Use Unicode Character “⠀” (U+2800) to prevent line breaks
-        df = df.rename(columns=rename_dict)
-        df_dict[username] = df
+        df_dict[username] = format_df(df)
 
     return render_template(
         'lists.jinja2', 
@@ -170,10 +173,8 @@ def user_list(username=None):
             'sqlite:///' + db_name, 
             # index_col='id',
             )
-    # change db index to number of row
-    df['id'] = df.index
-    # Use Unicode Character “⠀” (U+2800) to prevent line breaks
-    df = df.rename(columns=rename_dict)
+    
+    df = format_df(df)
     return render_template(
         'user_list.jinja2',
         **defaults, 
@@ -190,10 +191,7 @@ def user_list_(username=None):
             'sqlite:///' + db_name, 
             # index_col='id',
             )
-    # change db index to number of row
-    df['id'] = df.index
-    # Use Unicode Character “⠀” (U+2800) to prevent line breaks
-    df = df.rename(columns=rename_dict)
+    df = format_df(df)
     return render_template(
         'user_list.jinja2',
         **defaults, 
