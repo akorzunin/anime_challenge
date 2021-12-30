@@ -44,6 +44,17 @@ defaults = {
     'folder_content_html': folder_content_html,
     # 'url_for': url_for,
 }
+# rename columns in df
+# Use Unicode Character “⠀” (U+2800) to prevent line breaks
+rename_dict = {
+    'id': '№',
+    'to_usr': 'to⠀user⠀⠀⠀⠀⠀',
+    'from_usr': 'from user',
+    'max_ep': 'ep',
+    'name_en':'title name [en]',
+    'name_ru':'title name [ru]',
+    'title_id': 'title⠀id',
+    }
 # attach dashboard to flask
 app = init_dashboard(
     app,
@@ -94,38 +105,55 @@ def rules():
         **defaults,
         content='_')
 
-@app.route('/lists')
-def lists():
-    df_usr_dict = {}
-    # for loop for all members
+@app.route('/all_to_others')
+def lists_to_others():
+
+    df_dict = {}
     for username in members:
-        # read yaml file of member to list of ids
-        # read from G_DRIVE
-        # sleep(0.4)
-        if DOCKER:
-            filename = f'{G_DRIVE_PATH}/{username}_list.yaml'
-        else: 
-            filename = f"G:\\My Drive\\ANIME_CHALLENGE\\{username}_list.yaml"
-        with open(filename, 'r') as f:
-            dl = yaml.load(f, Loader=yaml.FullLoader)
-            # left only valid ids
-            ids = [i for i in dl.values() if isinstance(i, int)]
-        # get df w/ titles
-        dfr = a.get_title_by_ids(ids, TROTTLE)
-        # name of user who assigned title
-        dfr['from user'] = username
-        # user who need to watch title
-        dfr['to user'] = [key for key, val in dl.items() if isinstance(val, int)] 
-        # df w/ all titles of member list
-        df_usr_dict[username] = dfr
+        df = pd.read_sql(f'SELECT * FROM members_titles WHERE "from_usr" LIKE "{username}%"',
+            'sqlite:///' + db_name, 
+            # index_col='id',
+            )
+        # change db index to number of row
+        df['id'] = df.index
+        # Use Unicode Character “⠀” (U+2800) to prevent line breaks
+        df = df.rename(columns=rename_dict)
+        df_dict[username] = df
+
 
     return render_template(
         'lists.jinja2', 
-        column_names=dfr.columns.values, 
-        row_data={i: list(df_usr_dict[i].values.tolist()) for i in members},      
-        link_column="id", 
+        column_names=df_dict[members[-1]].columns.values, 
+        row_data={i: list(df_dict[i].values.tolist()) for i in members},      
+        link_column="title⠀id", 
         zip=zip,
-        **defaults,        
+        **defaults,
+        preposition='from',       
+        )
+
+@app.route('/all_from_others')
+def lists_from_others():
+
+    df_dict = {}
+    for username in members:
+        df = pd.read_sql(f'SELECT * FROM members_titles WHERE "to_usr" LIKE "{username}%"',
+            'sqlite:///' + db_name, 
+            # index_col='id',
+            )
+        # change db index to number of row
+        df['id'] = df.index
+        # Use Unicode Character “⠀” (U+2800) to prevent line breaks
+        df = df.rename(columns=rename_dict)
+        df_dict[username] = df
+
+    return render_template(
+        'lists.jinja2', 
+        column_names=df_dict[members[-1]].columns.values, 
+        row_data={i: list(df_dict[i].values.tolist()) for i in members},      
+        link_column="title⠀id", 
+        zip=zip,
+        **defaults,  
+        preposition='to',       
         )
 
 @app.route('/library')
@@ -144,13 +172,14 @@ def user_list(username=None):
             )
     # change db index to number of row
     df['id'] = df.index
-    df = df.rename(columns={'id': '№'})
+    # Use Unicode Character “⠀” (U+2800) to prevent line breaks
+    df = df.rename(columns=rename_dict)
     return render_template(
         'user_list.jinja2',
         **defaults, 
         column_names=df.columns.values, 
         row_data=list(df.values.tolist()),
-        link_column="title_id", 
+        link_column="title⠀id", 
         zip=zip,
         content=username)
 
@@ -163,13 +192,14 @@ def user_list_(username=None):
             )
     # change db index to number of row
     df['id'] = df.index
-    df = df.rename(columns={'id': '№'})
+    # Use Unicode Character “⠀” (U+2800) to prevent line breaks
+    df = df.rename(columns=rename_dict)
     return render_template(
         'user_list.jinja2',
         **defaults, 
         column_names=df.columns.values, 
         row_data=list(df.values.tolist()),
-        link_column="title_id", 
+        link_column="title⠀id", 
         zip=zip,
         content=username)
 
