@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 G_DRIVE_PATH = os.getenv('G_DRIVE_PATH')
 DOCKER = int(os.getenv('DOCKER'))
+DEBUG = bool(os.getenv('DEBUG', False))
 
 #define latensy to shikimori API [s]
 TROTTLE = 1
@@ -185,4 +186,8 @@ def admin():
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050)
+    if DEBUG:
+        app.run(debug=DEBUG, host='0.0.0.0', port=5050)
+    else:
+        from waitress import serve
+        serve(app, host="0.0.0.0", port=5050)
