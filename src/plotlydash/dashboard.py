@@ -2,10 +2,10 @@ import dash
 from dash.dependencies import Input, Output
 from dash import html
 from dash import dcc
-from SHIKI_API import ShiNoAuth
+from src.SHIKI_API import ShiNoAuth
 import plotly.express as px
 # from .layout import html_layout
-from member_list import members
+from src.member_list import members
 import random
 
 def init_dashboard(server, **kwargs):

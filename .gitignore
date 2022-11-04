@@ -21,3 +21,7 @@
 *.html
 xd quest/resources/sheet.css
 xd_quest.zip
+venv/
+*.ipynb
+notebooks/
+token.json

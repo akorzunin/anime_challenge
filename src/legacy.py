@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, url_for
-from member_list import members
-from dl_sheet import dl_sheet
+from src.member_list import members
+from src.dl_sheet import dl_sheet
 import os
 # download google sheet
 code, path = dl_sheet()

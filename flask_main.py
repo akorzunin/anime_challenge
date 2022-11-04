@@ -4,12 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime
 import pandas as pd
 from pandas.core.frame import DataFrame
-from SHIKI_API import ShiNoAuth, ShiAuth
-from member_list import members
+from src.SHIKI_API import ShiNoAuth, ShiAuth
+from src.member_list import members
 import yaml
 
 #import blueprints
-from legacy import legacy
+from src.legacy import legacy
 
 #load .env variables
 import os
@@ -22,7 +22,7 @@ DEBUG = bool(os.getenv('DEBUG', False))
 #define latensy to shikimori API [s]
 TROTTLE = 1
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=os.path.abspath('./src/templates'))
 # handle blueprints
 app.register_blueprint(legacy, url_prefix='/legacy')
 # get content of legacy sheet
@@ -30,11 +30,11 @@ SHEET_FOLDER_PATH = 'xd quest'
 folder_content_html = [''.join(i.split(".")[:-1]) for i in os.listdir(SHEET_FOLDER_PATH) if i.split(".")[-1] == 'html']
 
 # Import Dash application
-from plotlydash.dashboard import init_dashboard
+from src.plotlydash.dashboard import init_dashboard
 
 # render dashboard template
 from jinja2 import Environment, FileSystemLoader
-env = Environment(loader=FileSystemLoader('templates'))
+env = Environment(loader=FileSystemLoader('./src/templates'))
 template = env.get_template('dashboard.jinja2')
 
 a = ShiNoAuth()
@@ -57,7 +57,7 @@ app = init_dashboard(
 
 # attach SQL to flask
 db_name = 'database/member_lists.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_name
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 # this variable, db, will be used for all SQLAlchemy commands

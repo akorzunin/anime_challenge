@@ -1,1 +1,0 @@
-pkill -f flask_main.py
